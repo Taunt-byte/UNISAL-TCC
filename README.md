@@ -1,112 +1,79 @@
-# Projeto de Chocadeira Automática
+This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-## Visão Geral
+# Getting Started
 
-Segundo levantamento do USDA (Departamento de Agricultura dos Estados Unidos) divulgado em outubro de 2014, o Brasil se mantinha como o segundo maior produtor mundial de carne de frango, com produção prevista para 12,3 milhões de toneladas em 2014, demonstrando um mercado cada vez maior e com grande potencial econômico.
+>**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
-## Incubação de Ovos
+## Step 1: Start the Metro Server
 
-### Processo de Incubação
+First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
 
-A incubação de ovos é um processo crítico na avicultura, responsável pelo desenvolvimento embrionário e eclosão de aves. Este processo pode ser realizado de forma natural ou artificialmente, em incubadoras controladas. A incubação artificial é amplamente utilizada na produção comercial de aves devido à sua eficiência e capacidade de aumentar a produtividade. As incubadoras artificiais são equipamentos projetados para manter condições ideais para o desenvolvimento dos embriões.
+To start Metro, run the following command from the _root_ of your React Native project:
 
-### Importância da Temperatura e Umidade
+```bash
+# using npm
+npm start
 
-O período de incubação dos ovos é um momento crítico, principalmente por causa da temperatura. Segundo Meyerhof (1992), citado por Calil (2007), temperaturas desuniformes podem causar mortalidade embrionária no início do processo de incubação. A temperatura e a umidade variam conforme a espécie de ave. Para garantir o desenvolvimento saudável dos ovos de galinha, é essencial submetê-los a condições precisas de incubação durante um período de 21 dias, conforme descrito por North e Bell (1990).
-
-De acordo com Barbosa et al. (2007), a umidade relativa interna ideal varia entre 55% e 65% para ovos incubados em chocadeiras. Isso é cuidadosamente monitorado e mantido utilizando um termômetro de bulbo úmido, com uma faixa de temperatura entre 28 ºC e 30 ºC. Manter essa faixa de umidade é essencial para evitar complicações no desenvolvimento embrionário e garantir a eclosão saudável dos ovos. Outro aspecto importante é a viragem dos ovos, que precisa ser realizada a cada 2 horas.
-
-## Tipos de Chocadeiras
-
-### Chocadeira Industrial
-
-Uma chocadeira industrial é um equipamento usado para incubar ovos de aves em larga escala e geralmente de forma escalável. Essas chocadeiras são projetadas para otimizar a incubação de ovos.
-
-### Chocadeira Artesanal
-
-Uma chocadeira artesanal, ou caseira, é uma alternativa de menor escala feita com materiais simples. Embora menos sofisticadas que as industriais, elas também podem ser eficazes se bem manejadas e construídas, tendo como principal vantagem o preço mais baixo em relação à industrial.
-
-Ambos os tipos de chocadeiras têm seu lugar, dependendo das necessidades e dos recursos do produtor. A temperatura ideal para ambos os tipos de chocadeiras fica na faixa de 37,5°C a 38°C.
-
-## Microcontrolador
-
-O microcontrolador é um dispositivo presente em inúmeros aparelhos eletrônicos, desde celulares a geladeiras, sendo utilizado em diversos casos onde é preciso ter um sistema embarcado capaz de fazer um controle ou ação específica. Eles são pequenos computadores em um único circuito integrado contendo um processador, memória e periféricos de entrada/saída (STMicroelectronics, 2024).
-
-## Internet das Coisas (IoT)
-
-A Internet das Coisas (IoT) é um conceito em que objetos do cotidiano são conectados à internet e capazes de coletar e trocar dados. Segundo a Cisco, a IoT descreve a rede de objetos físicos que estão incorporados com sensores, software e outras tecnologias com o objetivo de conectar e trocar dados com outros dispositivos e sistemas pela internet.
-
-## IoT no Agronegócio
-
-A IoT está revolucionando o agronegócio, proporcionando ferramentas e tecnologias que aumentam a eficiência do trabalho no campo, reduzem custos e melhoram a produtividade. No campo, sensores IoT podem monitorar uma variedade de condições, como a umidade do solo, a temperatura, a luminosidade e até mesmo a saúde das plantas e dos animais.
-
-## Materiais e Métodos
-
-### Ferramentas Utilizadas
-
-Neste projeto, utilizamos diversas ferramentas para a construção da chocadeira automática, incluindo:
-
-- **React Native**: Framework de desenvolvimento de aplicativos móveis, utilizando a linguagem de programação JavaScript e a biblioteca React.
-- **ESP8266**: Componente central da chocadeira automática, atuando como o núcleo do sistema.
-- **Módulo Ethernet W5100**: Proporciona conectividade Ethernet ao ESP8266.
-- **Módulo Relé 12V 10A (2 Canais)**: Controle preciso dos dispositivos.
-- **Ventoinha 12V (3 Fios)**: Controla e mantém os níveis de umidade no interior da chocadeira.
-- **Sensor de Temperatura e Umidade DHT11**: Medição precisa de umidade e temperatura.
-- **Display LCD 16x2**: Interface de visualização para acompanhamento das informações essenciais do processo de incubação.
-
-## Programação do ESP8266
-
-### Bibliotecas Utilizadas
-
-```cpp
-#include <ESP8266WiFi.h> // Biblioteca para a conexão Wi-Fi
-#include <PubSubClient.h> // Biblioteca para o protocolo MQTT
-#include <Adafruit_Sensor.h> // Biblioteca de suporte para sensores
-#include <DHT.h> // Biblioteca para sensores DHT
-#include <DHT_U.h> // Biblioteca adicional para sensores DHT
-#include <Wire.h> // Biblioteca para comunicação I2C
-#include <LiquidCrystal_I2C.h> // Biblioteca para LCD I2C
+# OR using Yarn
+yarn start
 ```
 
-### Função para Reconectar ao Broker MQTT
+## Step 2: Start your Application
 
-```cpp
-void setup_wifi() {
-    delay(10);
-    Serial.println();
-    Serial.print("Conectando-se a ");
-    Serial.println(ssid);
+Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
 
-    WiFi.begin(ssid, password);
+### For Android
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
+```bash
+# using npm
+npm run android
 
-    Serial.println("");
-    Serial.println("WiFi conectado");
-    Serial.println("Endereço IP: ");
-    Serial.println(WiFi.localIP());
-}
+# OR using Yarn
+yarn android
 ```
 
-## Resultados Esperados
+### For iOS
 
-O desenvolvimento de uma chocadeira automatizada utilizando o ESP8266, aliado à criação de um aplicativo para dispositivos móveis, representa uma aplicação prática e inovadora dos conhecimentos adquiridos na faculdade. Espera-se criar uma máquina capaz de realizar a incubação de ovos e trazer aves saudáveis no processo.
+```bash
+# using npm
+npm run ios
 
-Os resultados esperados em relação ao aplicativo móvel são rapidez na verificação dos status dos ovos armazenados e portabilidade, além de uma interface de fácil compreensão.
+# OR using Yarn
+yarn ios
+```
 
-## Referências
+If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
 
-- Akhter, N. (2019). Learning React Native: Building Native Mobile Apps with JavaScript. O’Reilly Media.
-- Barbosa, F. J. V., et al. (2007). Sistema alternativo de criação de galinhas caipiras. Teresina: Embrapa Meio-Norte.
-- Calil, T. A. C. (2007). Princípios básicos de Incubação. In: Anais da Conferência Apinco.
-- Cisco. What is the Internet of Things (IoT)?. Retrieved from [Cisco](https://www.cisco.com/c/en/us/solutions/internet-of-things/overview.html).
-- IBM. Internet of Things. Retrieved from [IBM](https://www.ibm.com/br-pt/topics/internet-of-things).
-- IBM. What is IoT in Agriculture?. Retrieved from [IBM](https://www.ibm.com/blog/what-is-iot-in-agriculture).
-- Kumar, A., & Singh, R. K. (2016). Comparative analysis of angularjs and reactjs. International Journal of Latest Trends in Engineering and Technology, 7(4), 225–227.
-- North, M. O., & Bell, D. D. (1990). Commercial chicken production manual. Ontario: Library of Congress.
-- Parashar, N., & Rajan, N. (2020). React Native Cookbook: Bringing the Web to Native Platforms. Packt Publishing.
-- Proakis, J. G., & Manolakis, D. G. (2006). Digital Signal Processing: Principles, Algorithms, and Applications. 4th ed. Boston: Pearson.
-- Schwartz, M. (2016). Internet of Things with ESP8266. Packt Publishing.
+This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+
+## Step 3: Modifying your App
+
+Now that you have successfully run the app, let's modify it.
+
+1. Open `App.tsx` in your text editor of choice and edit some lines.
+2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+
+   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+
+## Congratulations! :tada:
+
+You've successfully run and modified your React Native App. :partying_face:
+
+### Now what?
+
+- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+
+# Troubleshooting
+
+If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+
+# Learn More
+
+To learn more about React Native, take a look at the following resources:
+
+- [React Native Website](https://reactnative.dev) - learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
+- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
+- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
