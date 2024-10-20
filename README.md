@@ -1,24 +1,32 @@
 # Projeto de Chocadeira Automática
 
-## Visão Geral
+Status: Em desenvolvimento.
+
+# Instalação
+
+## Repositorio
+
+## React Native
+
+# Visão Geral
 
 Segundo levantamento do USDA (Departamento de Agricultura dos Estados Unidos) divulgado em outubro de 2014, o Brasil se mantinha como o segundo maior produtor mundial de carne de frango, com produção prevista para 12,3 milhões de toneladas em 2014, demonstrando um mercado cada vez maior e com grande potencial econômico.
 
-## Incubação de Ovos
+# Incubação de Ovos
 
-### Processo de Incubação
+## Processo de Incubação
 
 A incubação de ovos é um processo crítico na avicultura, responsável pelo desenvolvimento embrionário e eclosão de aves. Este processo pode ser realizado de forma natural ou artificialmente, em incubadoras controladas. A incubação artificial é amplamente utilizada na produção comercial de aves devido à sua eficiência e capacidade de aumentar a produtividade. As incubadoras artificiais são equipamentos projetados para manter condições ideais para o desenvolvimento dos embriões.
 
-### Importância da Temperatura e Umidade
+## Importância da Temperatura e Umidade
 
 O período de incubação dos ovos é um momento crítico, principalmente por causa da temperatura. Segundo Meyerhof (1992), citado por Calil (2007), temperaturas desuniformes podem causar mortalidade embrionária no início do processo de incubação. A temperatura e a umidade variam conforme a espécie de ave. Para garantir o desenvolvimento saudável dos ovos de galinha, é essencial submetê-los a condições precisas de incubação durante um período de 21 dias, conforme descrito por North e Bell (1990).
 
 De acordo com Barbosa et al. (2007), a umidade relativa interna ideal varia entre 55% e 65% para ovos incubados em chocadeiras. Isso é cuidadosamente monitorado e mantido utilizando um termômetro de bulbo úmido, com uma faixa de temperatura entre 28 ºC e 30 ºC. Manter essa faixa de umidade é essencial para evitar complicações no desenvolvimento embrionário e garantir a eclosão saudável dos ovos. Outro aspecto importante é a viragem dos ovos, que precisa ser realizada a cada 2 horas.
 
-## Materiais e Métodos
+# Materiais e Métodos
 
-### Ferramentas Utilizadas
+## Ferramentas Utilizadas
 
 Neste projeto, utilizamos diversas ferramentas para a construção da chocadeira automática, incluindo:
 
@@ -30,9 +38,9 @@ Neste projeto, utilizamos diversas ferramentas para a construção da chocadeira
 - **Sensor de Temperatura e Umidade DHT11**: Medição precisa de umidade e temperatura.
 - **Display LCD 16x2**: Interface de visualização para acompanhamento das informações essenciais do processo de incubação.
 
-## Programação do ESP8266
+# Programação do ESP8266
 
-### Bibliotecas Utilizadas 
+## Bibliotecas Utilizadas 
 
 ```cpp
 #include <ESP8266WiFi.h> // Biblioteca para a conexão Wi-Fi
