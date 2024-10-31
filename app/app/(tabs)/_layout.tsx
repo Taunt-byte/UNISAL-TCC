@@ -9,12 +9,16 @@ export default function TabLayout() {
   const colorScheme = useColorScheme(); // Hook para definir se o dispositivo está no tema claro ou escuro
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint, // Define a cor dos ícones ativos com base no esquema de cores
-        headerShown: false, // Remove o cabeçalho superior
-      }}
-    >
+<Tabs
+  screenOptions={{
+    tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+    headerShown: false,
+    tabBarStyle: {
+      backgroundColor: colorScheme === 'dark' ? '#000' : '#fff', // Altera a cor de fundo com base no tema
+    },
+  }}
+>
+
       {/* Primeira aba - "Início" */}
       <Tabs.Screen
         name="index" // Define o nome da tela (rota)
@@ -38,6 +42,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      
     </Tabs>
   );
 }

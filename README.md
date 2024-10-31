@@ -1,73 +1,129 @@
 # Projeto de Chocadeira Automática
 
-Status: Em desenvolvimento.
+Status: Em desenvolvimento
 
-# Instalação
+---
 
-## Repositorio
+Este projeto envolve a criação de uma chocadeira automática que monitora e controla a temperatura e a umidade para o processo de incubação de ovos. Utiliza um microcontrolador ESP8266 para coletar dados de um sensor DHT11 e enviar essas informações a um broker MQTT. Um aplicativo React Native exibe as condições em tempo real para o usuário, permitindo ajustes rápidos e monitoramento contínuo. 
 
-## React Native
+---
 
-# Visão Geral
+## Sumário
 
-Segundo levantamento do USDA (Departamento de Agricultura dos Estados Unidos) divulgado em outubro de 2014, o Brasil se mantinha como o segundo maior produtor mundial de carne de frango, com produção prevista para 12,3 milhões de toneladas em 2014, demonstrando um mercado cada vez maior e com grande potencial econômico.
+- [Visão Geral do Projeto](#visão-geral-do-projeto)
+- [Pré-requisitos](#pré-requisitos)
+- [Configuração do ESP8266](#configuração-do-esp8266)
+- [Configuração do Aplicativo React Native](#configuração-do-aplicativo-react-native)
+- [Como o Projeto Funciona](#como-o-projeto-funciona)
+- [Processo de Incubação](#processo-de-incubação)
+- [Materiais e Métodos](#materiais-e-métodos)
+- [Execução do Projeto](#execução-do-projeto)
+- [Referências](#referências)
 
-# Incubação de Ovos
+---
+
+## Visão Geral do Projeto
+
+### Componentes:
+
+- **ESP8266**: Coleta e envia dados de temperatura e umidade para o broker MQTT.
+- **Broker MQTT**: Intermediário que transmite os dados do ESP8266 ao aplicativo.
+- **Aplicativo React Native**: Exibe informações ao usuário e permite monitoramento em tempo real.
+
+---
+
+## Pré-requisitos
+
+1. **Hardware**:
+   - ESP8266
+   - Sensor DHT11
+   - Cabos e demais componentes para a montagem
+
+2. **Software**:
+   - [Arduino IDE](https://www.arduino.cc/en/software)
+   - Bibliotecas: `ESP8266WiFi`, `PubSubClient`, `DHT`, `DHT_U`, `LiquidCrystal_I2C`
+   - Broker MQTT (ex.: Mosquitto, HiveMQ)
+
+---
+
+## Configuração do ESP8266
+
+Configurações essenciais para que o ESP8266 se conecte ao Wi-Fi, faça leituras do DHT11, e envie os dados para o broker MQTT. 
+
+```cpp
+// Inclusão das bibliotecas
+#include <ESP8266WiFi.h> 
+#include <PubSubClient.h>
+#include <DHT.h>
+#include <LiquidCrystal_I2C.h>
+
+// Configurações de rede e broker MQTT
+const char* ssid = "SEU_SSID";
+const char* password = "SUA_SENHA";
+const char* mqtt_server = "IP_DO_BROKER";
+const char* mqtt_topic = "topico/temperatura";
+
+// Funções e setup para conexão Wi-Fi e leitura do sensor
+void setup() { /* configuração */ }
+void loop() { /* leitura e publicação dos dados */ }
+```
+
+---
+
+## Configuração do Aplicativo React Native
+
+O aplicativo conecta-se ao broker MQTT e exibe as leituras de temperatura e umidade recebidas.
+
+```javascript
+import MQTT from "sp-react-native-mqtt";
+
+// Função principal
+export default function HomeScreen() { 
+  /* Código para conexão, recebimento e exibição dos dados */
+}
+```
+
+---
+
+## Como o Projeto Funciona
+
+1. **ESP8266** coleta e publica dados no broker MQTT.
+2. **Broker MQTT** distribui os dados.
+3. **Aplicativo React Native** conecta-se ao broker e exibe os dados em tempo real.
+
+---
 
 ## Processo de Incubação
 
-A incubação de ovos é um processo crítico na avicultura, responsável pelo desenvolvimento embrionário e eclosão de aves. Este processo pode ser realizado de forma natural ou artificialmente, em incubadoras controladas. A incubação artificial é amplamente utilizada na produção comercial de aves devido à sua eficiência e capacidade de aumentar a produtividade. As incubadoras artificiais são equipamentos projetados para manter condições ideais para o desenvolvimento dos embriões.
+### Importância do Controle de Temperatura e Umidade
 
-## Importância da Temperatura e Umidade
+Temperatura e umidade controladas são essenciais para uma incubação saudável. Segundo Meyerhof (1992), temperaturas desuniformes podem causar mortalidade embrionária. 
 
-O período de incubação dos ovos é um momento crítico, principalmente por causa da temperatura. Segundo Meyerhof (1992), citado por Calil (2007), temperaturas desuniformes podem causar mortalidade embrionária no início do processo de incubação. A temperatura e a umidade variam conforme a espécie de ave. Para garantir o desenvolvimento saudável dos ovos de galinha, é essencial submetê-los a condições precisas de incubação durante um período de 21 dias, conforme descrito por North e Bell (1990).
+Para ovos de galinha, recomenda-se uma umidade entre 55% e 65% e temperaturas entre 28 ºC e 30 ºC para garantir condições ideais de incubação.
 
-De acordo com Barbosa et al. (2007), a umidade relativa interna ideal varia entre 55% e 65% para ovos incubados em chocadeiras. Isso é cuidadosamente monitorado e mantido utilizando um termômetro de bulbo úmido, com uma faixa de temperatura entre 28 ºC e 30 ºC. Manter essa faixa de umidade é essencial para evitar complicações no desenvolvimento embrionário e garantir a eclosão saudável dos ovos. Outro aspecto importante é a viragem dos ovos, que precisa ser realizada a cada 2 horas.
+---
 
-# Materiais e Métodos
+## Materiais e Métodos
 
-## Ferramentas Utilizadas
+- **Ferramentas Utilizadas**:
+  - **React Native** para o desenvolvimento do app móvel.
+  - **ESP8266** como controlador principal.
+  - **Módulo Ethernet W5100** para conectividade.
+  - **Relé 12V e ventoinha 12V** para manter os níveis de umidade.
+  - **Sensor DHT11** para monitoramento de temperatura e umidade.
 
-Neste projeto, utilizamos diversas ferramentas para a construção da chocadeira automática, incluindo:
+---
 
-- **React Native**: Framework de desenvolvimento de aplicativos móveis, utilizando a linguagem de programação JavaScript e a biblioteca React.
-- **ESP8266**: Componente central da chocadeira automática, atuando como o núcleo do sistema.
-- **Módulo Ethernet W5100**: Proporciona conectividade Ethernet ao ESP8266.
-- **Módulo Relé 12V 10A (2 Canais)**: Controle preciso dos dispositivos.
-- **Ventoinha 12V (3 Fios)**: Controla e mantém os níveis de umidade no interior da chocadeira.
-- **Sensor de Temperatura e Umidade DHT11**: Medição precisa de umidade e temperatura.
-- **Display LCD 16x2**: Interface de visualização para acompanhamento das informações essenciais do processo de incubação.
+## Execução do Projeto
 
-# Programação do ESP8266
+1. **Configure o ESP8266** com suas credenciais de rede e detalhes do broker.
+2. **Instale o broker MQTT** em sua rede ou use um serviço online.
+3. **Execute o aplicativo React Native** em um dispositivo móvel na mesma rede.
 
-## Bibliotecas Utilizadas 
-
-```cpp
-#include <ESP8266WiFi.h> // Biblioteca para a conexão Wi-Fi
-#include <PubSubClient.h> // Biblioteca para o protocolo MQTT
-#include <Adafruit_Sensor.h> // Biblioteca de suporte para sensores
-#include <DHT.h> // Biblioteca para sensores DHT
-#include <DHT_U.h> // Biblioteca adicional para sensores DHT
-#include <Wire.h> // Biblioteca para comunicação I2C
-#include <LiquidCrystal_I2C.h> // Biblioteca para LCD I2C
-```
-
-## Resultados Esperados
-
-O desenvolvimento de uma chocadeira automatizada utilizando o ESP8266, aliado à criação de um aplicativo para dispositivos móveis, representa uma aplicação prática e inovadora dos conhecimentos adquiridos na faculdade. Espera-se criar uma máquina capaz de realizar a incubação de ovos e trazer aves saudáveis no processo.
-
-Os resultados esperados em relação ao aplicativo móvel são rapidez na verificação dos status dos ovos armazenados e portabilidade, além de uma interface de fácil compreensão.
+---
 
 ## Referências
 
-- Akhter, N. (2019). Learning React Native: Building Native Mobile Apps with JavaScript. O’Reilly Media.
-- Barbosa, F. J. V., et al. (2007). Sistema alternativo de criação de galinhas caipiras. Teresina: Embrapa Meio-Norte.
-- Calil, T. A. C. (2007). Princípios básicos de Incubação. In: Anais da Conferência Apinco.
-- Cisco. What is the Internet of Things (IoT)?. Retrieved from [Cisco](https://www.cisco.com/c/en/us/solutions/internet-of-things/overview.html).
-- IBM. Internet of Things. Retrieved from [IBM](https://www.ibm.com/br-pt/topics/internet-of-things).
-- IBM. What is IoT in Agriculture?. Retrieved from [IBM](https://www.ibm.com/blog/what-is-iot-in-agriculture).
-- Kumar, A., & Singh, R. K. (2016). Comparative analysis of angularjs and reactjs. International Journal of Latest Trends in Engineering and Technology, 7(4), 225–227.
-- North, M. O., & Bell, D. D. (1990). Commercial chicken production manual. Ontario: Library of Congress.
-- Parashar, N., & Rajan, N. (2020). React Native Cookbook: Bringing the Web to Native Platforms. Packt Publishing.
-- Proakis, J. G., & Manolakis, D. G. (2006). Digital Signal Processing: Principles, Algorithms, and Applications. 4th ed. Boston: Pearson.
-- Schwartz, M. (2016). Internet of Things with ESP8266. Packt Publishing.
+- Akhter, N. (2019). *Learning React Native*. O’Reilly Media.
+- Barbosa, F. J. V., et al. (2007). *Sistema alternativo de criação de galinhas caipiras*. Embrapa.
+- IBM. *Internet of Things* (IoT).
