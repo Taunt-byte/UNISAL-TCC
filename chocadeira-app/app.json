@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "tech-agro",
-    "slug": "tech-agro",
+    "name": "chocadeira-app",
+    "slug": "chocadeira-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "techagro",
+    "scheme": "chocadeiraapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
