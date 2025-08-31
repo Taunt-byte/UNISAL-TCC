@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div> {/* <- Wrapper obrigatório para evitar erro de hidratação */}
-      <nav className="bg-blue-500 text-white py-4">
+    <div>
+      <nav className="bg-violet-800 text-white py-4">
         <div className="container mx-auto flex justify-between items-center px-4">
           <h1 className="text-lg font-bold">Meu Site</h1>
           <ul className="flex space-x-4">
@@ -15,7 +15,7 @@ export default function Navbar() {
             </li>
             <li>
               <Link href="/LoginPage">
-                <button className="hover:underline">Gestão</button>
+                <button className="hover:underline">Login</button>
               </Link>
             </li>
           </ul>
