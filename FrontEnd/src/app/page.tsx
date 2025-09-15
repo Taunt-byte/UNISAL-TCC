@@ -26,7 +26,7 @@ export default function Home() {
         <div className="flex-1 py-20 px-8 grid gap-12 md:grid-cols-3 max-w-6xl mx-auto  ">
           <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
             <Image
-              src="/icons/inventory.svg"
+              src="/icons/inventory.png"
               alt="Ícone estoque"
               width={50}
               height={50}

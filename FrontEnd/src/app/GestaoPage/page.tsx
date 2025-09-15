@@ -1,11 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
-
-interface Stock {
-  id: number;
-  name: string;
-}
+import { useState } from "react";
 
 interface Movement {
   id: number;
@@ -19,94 +13,60 @@ interface Product {
   name: string;
   description?: string;
   quantity: number;
-  stockId: number;
   movements: Movement[];
 }
 
 export default function GestaoPage() {
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [selectedStockId, setSelectedStockId] = useState<number | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([
+    { id: 1, name: "Arroz", description: "Pacote 5kg", quantity: 50, movements: [] },
+    { id: 2, name: "Feijão", description: "Pacote 1kg", quantity: 20, movements: [] },
+  ]);
+
   const [newProduct, setNewProduct] = useState<Omit<Product, "id" | "movements">>({
     name: "",
     description: "",
     quantity: 0,
-    stockId: 0,
   });
+
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [historyProduct, setHistoryProduct] = useState<Product | null>(null);
 
-  /** Carregar estoques */
-  const loadStocks = async () => {
-    const res = await fetch("http://localhost:4000/stocks");
-    const data: Stock[] = await res.json();
-    setStocks(data);
-    if (!selectedStockId && data.length > 0) setSelectedStockId(data[0].id);
+  const addProduct = () => {
+    if (!newProduct.name || newProduct.quantity <= 0) return alert("Preencha corretamente!");
+    const newProd: Product = {
+      id: Date.now(),
+      name: newProduct.name,
+      description: newProduct.description,
+      quantity: newProduct.quantity,
+      movements: [],
+    };
+    setProducts([...products, newProd]);
+    setNewProduct({ name: "", description: "", quantity: 0 });
   };
 
-  /** Carregar produtos do estoque selecionado */
-  const loadProducts = async (stockId: number) => {
-    const res = await fetch(`http://localhost:4000/products?stockId=${stockId}`);
-    const data: Product[] = await res.json();
-    setProducts(data);
-  };
-
-  useEffect(() => { loadStocks(); }, []);
-  useEffect(() => { if (selectedStockId) loadProducts(selectedStockId); }, [selectedStockId]);
-
-  /** Adicionar produto */
-  const addProduct = async () => {
-    if (!newProduct.name || newProduct.quantity <= 0 || !selectedStockId) return alert("Preencha corretamente!");
-    await fetch("http://localhost:4000/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...newProduct, stockId: selectedStockId }),
-    });
-    setNewProduct({ name: "", description: "", quantity: 0, stockId: 0 });
-    if (selectedStockId) loadProducts(selectedStockId);
-  };
-
-  /** Editar produto */
-  const updateProduct = async () => {
+  const updateProduct = () => {
     if (!editingProduct) return;
-    await fetch(`http://localhost:4000/products/${editingProduct.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingProduct),
-    });
+    setProducts(products.map(p => p.id === editingProduct.id ? editingProduct : p));
     setEditingProduct(null);
-    if (selectedStockId) loadProducts(selectedStockId);
   };
 
-  /** Movimentação */
-  const addMovement = async (productId: number, type: "entrada" | "saida") => {
+  const addMovement = (productId: number, type: "entrada" | "saida") => {
     const amount = Number(prompt(`Quantidade de ${type}:`));
     if (!amount || amount <= 0) return;
 
-    await fetch("http://localhost:4000/products/movement", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId, type, amount }),
-    });
-
-    if (selectedStockId) loadProducts(selectedStockId);
+    setProducts(products.map(p => {
+      if (p.id === productId) {
+        const newQuantity = type === "entrada" ? p.quantity + amount : p.quantity - amount;
+        const newMovement: Movement = { id: Date.now(), type, amount, date: new Date().toISOString() };
+        return { ...p, quantity: newQuantity, movements: [...p.movements, newMovement] };
+      }
+      return p;
+    }));
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen font-sans text-gray-800">
       <h1 className="text-4xl font-bold mb-8 text-center">Gestão de Estoque 📦</h1>
-
-      {/* Seleção de estoque */}
-      <div className="mb-6 flex gap-4 items-center">
-        <label className="font-semibold">Estoque:</label>
-        <select
-          value={selectedStockId || ""}
-          onChange={(e) => setSelectedStockId(Number(e.target.value))}
-          className="border px-3 py-2 rounded"
-        >
-          {stocks.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
-      </div>
 
       {/* Formulário de novo produto */}
       <div className="bg-white p-6 rounded-2xl shadow-lg mb-8">

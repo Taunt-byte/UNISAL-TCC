@@ -25,7 +25,7 @@ export default function HistoricoPage() {
       <div className="bg-white shadow-lg rounded-2xl p-6">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-gray-200">
+            <tr className="bg-violet-800 text-white">
               <th className="border-b px-4 py-3">Produto</th>
               <th className="border-b px-4 py-3">Tipo</th>
               <th className="border-b px-4 py-3">Quantidade</th>
@@ -35,13 +35,13 @@ export default function HistoricoPage() {
           <tbody>
             {movements.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-gray-500">
+                <td colSpan={4} className="text-center py-6 text-gray-700">
                   Nenhuma movimentação registrada
                 </td>
               </tr>
             ) : (
               movements.map((move, i) => (
-                <tr key={i} className="hover:bg-gray-50">
+                <tr key={i} className="hover:bg-gray-50 text-gray-800">
                   <td className="border-b px-4 py-2">{move.productName}</td>
                   <td className="border-b px-4 py-2">
                     {move.type === "entrada" ? "Entrada" : "Saída"}
