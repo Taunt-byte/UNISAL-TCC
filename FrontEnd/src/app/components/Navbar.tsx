@@ -1,28 +1,80 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div>
-      <nav className="bg-violet-800 text-white py-4">
-        <div className="container mx-auto flex justify-between items-center px-4">
-                        <Link href="/">
-                <button className="">NexGestor</button>
-              </Link>
-          <ul className="flex space-x-4">
-            <li>
-              <Link href="/">
-                <button className="hover:underline">Home</button>
-              </Link>
-            </li>
-            <li>
-              <Link href="/LoginPage">
-                <button className="hover:underline">Login</button>
-              </Link>
-            </li>
-          </ul>
+    <div className="bg-violet-800 text-white shadow-md">
+      <div className="h-2 bg-violet-800">
+
+      </div>
+      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+        {/* Logo */}
+        <Link href="/" className="text-xl font-bold tracking-wide">
+          NexGestor
+        </Link>
+
+        {/* Links Desktop */}
+        <div className="hidden md:flex space-x-6">
+          <Link href="/" className="hover:text-gray-300">
+            Início
+          </Link>
+          <Link href="/EstoquesPage" className="hover:text-gray-300">
+            EstoquesPage
+          </Link>
+          <Link href="/LoginPage" className="hover:text-gray-300">
+            Acessar
+          </Link>
+          <Link href="/contato" className="hover:text-gray-300">
+            Contato
+          </Link>
         </div>
-      </nav>
+
+        {/* Botão Mobile */}
+        <button
+          className="md:hidden focus:outline-none"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
+        </button>
+      </div>
+
+      {/* Menu Mobile */}
+      {isOpen && (
+        <div className="md:hidden bg-violet-700 px-6 py-4 space-y-3">
+          <Link
+            href="/"
+            className="block hover:text-gray-300"
+            onClick={() => setIsOpen(false)}
+          >
+            Início
+          </Link>
+          <Link
+            href="/sobre"
+            className="block hover:text-gray-300"
+            onClick={() => setIsOpen(false)}
+          >
+            Sobre
+          </Link>
+          <Link
+            href="/contato"
+            className="block hover:text-gray-300"
+            onClick={() => setIsOpen(false)}
+          >
+            Contato
+          </Link>
+          <Link
+            href="/LoginPage"
+            className="block hover:text-gray-300"
+            onClick={() => setIsOpen(false)}
+          >
+            Acessar
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
