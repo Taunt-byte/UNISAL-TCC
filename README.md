@@ -1,7 +1,3 @@
-Beleza, Lucas 🙌. Seu README pode ficar mais organizado e profissional, com uma breve introdução, lista de recursos, instruções de uso e tecnologias. Aqui vai uma versão melhorada:
-
----
-
 # 📦 UNISAL-TCC — Sistema de Estoque
 
 Um sistema completo para **controle de estoque e administração de produtos**, desenvolvido como parte do TCC da UNISAL.
