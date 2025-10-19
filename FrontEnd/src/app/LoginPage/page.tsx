@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,7 +41,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-gray-700 bg-gray-100">
+    <div className="text-gray-700 bg-gray-100">
+      <Navbar />
+    <div className="min-h-screen flex items-center justify-center ">
       <div className="bg-white shadow-lg rounded-2xl w-full max-w-md p-8">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Login
@@ -99,6 +103,8 @@ export default function LoginPage() {
           </a>
         </p>
       </div>
+    </div>
+    <Footer />
     </div>
   );
 }
