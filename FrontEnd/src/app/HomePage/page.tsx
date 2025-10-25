@@ -20,7 +20,7 @@ export function HomePage() {
         {/* Botão de acesso */}
         <div className="mt-10">
           <Link
-            href="/LoginPage"
+            href="/login"
             className="inline-flex items-center px-8 py-3 bg-violet-600 text-white font-semibold rounded-xl shadow hover:bg-violet-700 transition duration-300"
           >
             Acessar o Sistema
