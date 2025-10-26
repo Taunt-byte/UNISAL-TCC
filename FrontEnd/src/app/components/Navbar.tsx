@@ -22,10 +22,7 @@ export default function Navbar() {
           <Link href="/" className="hover:text-gray-300">
             Início
           </Link>
-          <Link href="/EstoquesPage" className="hover:text-gray-300">
-            EstoquesPage
-          </Link>
-          <Link href="/LoginPage" className="hover:text-gray-300">
+          <Link href="/login" className="hover:text-gray-300">
             Acessar
           </Link>
           <Link href="/contato" className="hover:text-gray-300">
