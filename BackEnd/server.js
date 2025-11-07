@@ -13,9 +13,10 @@ app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 // =================== CONEXÃO COM BANCO ===================
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado ao MongoDB"))
-  .catch(err => console.error("❌ Erro MongoDB:", err));
+  .catch((err) => console.error("❌ Erro MongoDB:", err));
 
 // =================== SCHEMAS ===================
 const userSchema = new mongoose.Schema({
@@ -26,9 +27,14 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 const itemSchema = new mongoose.Schema({
-  name: String,
+  nome: { type: String, required: true },
+  quantidade: { type: Number, required: true },
+  armazem: { type: String, required: true },
+  dataChegada: { type: Date, required: true },
   createdAt: { type: Date, default: Date.now },
 });
+const Item = mongoose.model("Item", itemSchema);
+
 const historySchema = new mongoose.Schema({
   itemId: String,
   action: String,
@@ -36,10 +42,9 @@ const historySchema = new mongoose.Schema({
   newValue: String,
   date: { type: Date, default: Date.now },
 });
-const Item = mongoose.model("Item", itemSchema);
 const History = mongoose.model("History", historySchema);
 
-// =================== EMAIL (NODEMAILER) ===================
+// =================== NODEMAILER ===================
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -62,7 +67,7 @@ app.post("/auth/register", async (req, res) => {
     await transporter.sendMail({
       to: email,
       subject: "Cadastro realizado com sucesso",
-      html: `<h3>Bem-vindo ao sistema!</h3><p>Sua conta foi criada.</p>`,
+      html: `<h3>Bem-vindo ao sistema!</h3><p>Sua conta foi criada com sucesso.</p>`,
     });
 
     res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
@@ -80,7 +85,9 @@ app.post("/auth/login", async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(401).json({ error: "Senha incorreta" });
 
-  const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+  const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
   res.json({ token });
 });
 
@@ -116,11 +123,28 @@ app.post("/auth/reset/:token", async (req, res) => {
 // =================== ROTAS DE ITENS ===================
 app.post("/items", async (req, res) => {
   try {
-    const { name } = req.body;
-    const newItem = await Item.create({ name });
-    await History.create({ itemId: newItem._id, action: "criado", newValue: name });
+    const { nome, quantidade, armazem, dataChegada } = req.body;
+
+    if (!nome || !quantidade || !armazem || !dataChegada) {
+      return res.status(400).json({ error: "Campos obrigatórios faltando" });
+    }
+
+    const newItem = await Item.create({
+      nome,
+      quantidade,
+      armazem,
+      dataChegada: new Date(dataChegada),
+    });
+
+    await History.create({
+      itemId: newItem._id,
+      action: "criado",
+      newValue: JSON.stringify({ nome, quantidade, armazem, dataChegada }),
+    });
+
     res.status(201).json(newItem);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Erro ao criar item" });
   }
 });
@@ -131,36 +155,51 @@ app.get("/items", async (req, res) => {
 });
 
 app.put("/items/:id", async (req, res) => {
-  const { name } = req.body;
-  const item = await Item.findById(req.params.id);
-  if (!item) return res.status(404).json({ error: "Item não encontrado" });
+  try {
+    const { nome, quantidade, armazem, dataChegada } = req.body;
+    const item = await Item.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Item não encontrado" });
 
-  const oldValue = item.name;
-  item.name = name;
-  await item.save();
+    const oldValue = JSON.stringify(item);
 
-  await History.create({
-    itemId: item._id,
-    action: "editado",
-    oldValue,
-    newValue: name,
-  });
+    item.nome = nome ?? item.nome;
+    item.quantidade = quantidade ?? item.quantidade;
+    item.armazem = armazem ?? item.armazem;
+    item.dataChegada = dataChegada ? new Date(dataChegada) : item.dataChegada;
 
-  res.json(item);
+    await item.save();
+
+    await History.create({
+      itemId: item._id,
+      action: "editado",
+      oldValue,
+      newValue: JSON.stringify(item),
+    });
+
+    res.json(item);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao editar item" });
+  }
 });
 
 app.delete("/items/:id", async (req, res) => {
-  const item = await Item.findById(req.params.id);
-  if (!item) return res.status(404).json({ error: "Item não encontrado" });
+  try {
+    const item = await Item.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Item não encontrado" });
 
-  await item.deleteOne();
-  await History.create({
-    itemId: item._id,
-    action: "removido",
-    oldValue: item.name,
-  });
+    await item.deleteOne();
 
-  res.json({ message: "Item removido" });
+    await History.create({
+      itemId: item._id,
+      action: "removido",
+      oldValue: JSON.stringify(item),
+    });
+
+    res.json({ message: "Item removido" });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao remover item" });
+  }
 });
 
 app.get("/items/:id/history", async (req, res) => {
@@ -169,4 +208,5 @@ app.get("/items/:id/history", async (req, res) => {
 });
 
 // =================== SERVIDOR ===================
-app.listen(4000, () => console.log("🚀 Backend rodando em http://localhost:4000"));
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`🚀 Backend rodando em http://localhost:${PORT}`));

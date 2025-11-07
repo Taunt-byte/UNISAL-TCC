@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import Link from "next/link";
 
 /**
@@ -46,12 +46,6 @@ export function HomePage() {
         <section className="max-w-6xl mx-auto py-20 px-6 grid gap-12 md:grid-cols-3">
           {/* Card: Gestão de Produtos */}
           <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition duration-300">
-            <Image
-              src="/icons/inventory.png"
-              alt="Ícone de Estoque"
-              width={50}
-              height={50}
-            />
             <h2 className="text-xl font-semibold mt-4">Gestão de Produtos</h2>
             <p className="mt-2 text-gray-600">
               Cadastre, edite e acompanhe os itens do seu estoque em tempo real.
@@ -60,12 +54,6 @@ export function HomePage() {
 
           {/* Card: Relatórios */}
           <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition duration-300">
-            <Image
-              src="/icons/analytics.svg"
-              alt="Ícone de Relatórios"
-              width={50}
-              height={50}
-            />
             <h2 className="text-xl font-semibold mt-4">
               Relatórios Inteligentes
             </h2>
@@ -76,12 +64,6 @@ export function HomePage() {
 
           {/* Card: Segurança */}
           <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition duration-300">
-            <Image
-              src="/icons/security.svg"
-              alt="Ícone de Segurança"
-              width={50}
-              height={50}
-            />
             <h2 className="text-xl font-semibold mt-4">Segurança Garantida</h2>
             <p className="mt-2 text-gray-600">
               Seus dados são protegidos com autenticação segura e backups
