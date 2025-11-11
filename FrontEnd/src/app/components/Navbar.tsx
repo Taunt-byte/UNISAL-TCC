@@ -7,7 +7,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-violet-800 text-white shadow-md">
+    <div className="bg-violet-800 text-white shadow-md font-[Cambria]">
       <div className="h-2 bg-violet-800">
 
       </div>
@@ -22,10 +22,14 @@ export default function Navbar() {
           <Link href="/" className="hover:text-gray-300">
             Início
           </Link>
-          <Link href="/login" className="hover:text-gray-300">
-            Acessar
+          <Link
+            href="/Sobre"
+            className="block hover:text-gray-300"
+            onClick={() => setIsOpen(false)}
+          >
+            Sobre
           </Link>
-          <Link href="/contato" className="hover:text-gray-300">
+          <Link href="/Contato" className="hover:text-gray-300">
             Contato
           </Link>
         </div>
@@ -50,25 +54,18 @@ export default function Navbar() {
             Início
           </Link>
           <Link
-            href="/sobre"
+            href="/Sobre"
             className="block hover:text-gray-300"
             onClick={() => setIsOpen(false)}
           >
             Sobre
           </Link>
           <Link
-            href="/contato"
+            href="/Contato"
             className="block hover:text-gray-300"
             onClick={() => setIsOpen(false)}
           >
             Contato
-          </Link>
-          <Link
-            href="/LoginPage"
-            className="block hover:text-gray-300"
-            onClick={() => setIsOpen(false)}
-          >
-            Acessar
           </Link>
         </div>
       )}

@@ -26,7 +26,7 @@ export default function Login() {
       if (!res.ok) throw new Error(data.error);
 
       localStorage.setItem("token", data.token);
-      router.push("/gestao");
+      router.push("/EstoquePage");
     } catch(err:any) { setError(err.message) }
   };
 

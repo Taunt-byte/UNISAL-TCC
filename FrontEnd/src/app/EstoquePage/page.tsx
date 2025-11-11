@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
-import ProductForm from "../components/ProductForm";
+import CadastroProdutos from "../components/CadastroProdutos";
 import { Item, getDatePart } from "../components/types";
 import DashboardCards from "../components/DashBoardCards";
-import DashboardCharts from "../components/DashBoardCharts";
+import Movimentacoes from "../components/Movimentacao";
+import Footer from "../components/Footer";
 
 export default function EstoquePage() {
   const [items, setItems] = useState<Item[]>([]);
@@ -35,22 +36,34 @@ export default function EstoquePage() {
   return (
     <div className="bg-gray-100 min-h-screen text-black font-[Cambria]">
       <Navbar />
-
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl  font-bold text-center mb-8">Gestão de Estoque</h1>
-
-        <ProductForm onSave={handleSave} totalAtual={totalEstoque} />
-    <div>
-      <DashboardCards
-        totalProdutos={280}
-        produtosEmEstoque={220}
-        produtosVendidos={60}
-        custoTotal={15200.75}
-      />
-
-      <DashboardCharts capacidadeAtual={220} />
-    </div>
+      <div className="max-w-6xl mx-auto p-5">
+        <h1 className="text-3xl font-bold text-center">
+          Gestão de Estoque
+        </h1>
+        </div>
+        <div className="max-w-6xl mx-auto p-2 p-6 mb-12">
+        <DashboardCards
+          totalProdutos={items.length}
+          produtosEmEstoque={items.reduce(
+            (acc, item) => acc + item.quantidade,
+            0
+          )}
+          produtosVendidos={items.reduce((acc, item) => acc + item.vendidos, 0)}
+          custoTotal={items.reduce(
+            (acc, item) => acc + item.custo * item.quantidade,
+            0
+          )}
+        />
       </div>
+        <div>
+        <CadastroProdutos onSave={handleSave} totalAtual={totalEstoque} />
+        </div>
+        <div>
+          <Movimentacoes />
+        </div>
+      <Footer />
     </div>
+
+    
   );
 }

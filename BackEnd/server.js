@@ -5,18 +5,36 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import cors from "cors";
 import dotenv from "dotenv";
+import colors from "colors"; // <-- Para logs coloridos
 
 dotenv.config();
 
 const app = express();
+
+// =================== MIDDLEWARES ===================
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-// =================== CONEXÃO COM BANCO ===================
+// =================== LOG DE INÍCIO ===================
+console.log("🚀 Iniciando servidor...".cyan);
+
+// =================== CONEXÃO COM O MONGO ===================
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Conectado ao MongoDB"))
-  .catch((err) => console.error("❌ Erro MongoDB:", err));
+  .then(() =>
+    console.log("✅ Conectado ao MongoDB".green)
+  )
+  .catch((err) =>
+    console.error("❌ Erro ao conectar ao MongoDB:\n".red, err)
+  );
+
+// =================== ROTA BASE ===================
+app.get("/", (req, res) => {
+  res.send(`
+    <h1 style="color: #6A0DAD; font-family: Arial;">✅ Servidor Rodando!</h1>
+    <p>API de Gestão de Estoque Online.</p>
+  `);
+});
 
 // =================== SCHEMAS ===================
 const userSchema = new mongoose.Schema({
@@ -55,11 +73,17 @@ const transporter = nodemailer.createTransport({
 });
 
 // =================== ROTAS DE AUTENTICAÇÃO ===================
+
+// REGISTER
 app.post("/auth/register", async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: "Usuário já cadastrado" });
+    if (exists) {
+      console.log("⚠️ Tentativa de cadastro com email existente".yellow);
+      return res.status(400).json({ message: "Usuário já cadastrado" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
     await User.create({ email, password: hashed });
@@ -70,31 +94,51 @@ app.post("/auth/register", async (req, res) => {
       html: `<h3>Bem-vindo ao sistema!</h3><p>Sua conta foi criada com sucesso.</p>`,
     });
 
+    console.log(`✅ Usuário cadastrado: ${email}`.green);
     res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erro no cadastro:".red, err);
     res.status(400).json({ error: "Erro ao cadastrar usuário" });
   }
 });
 
+// LOGIN
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
+
+  console.log(`🔐 Tentativa de login: ${email}`.blue);
+
   const user = await User.findOne({ email });
-  if (!user) return res.status(401).json({ error: "Usuário não encontrado" });
+  if (!user) {
+    console.log("❌ Usuário não encontrado".red);
+    return res.status(401).json({ error: "Usuário não encontrado" });
+  }
 
   const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json({ error: "Senha incorreta" });
+  if (!match) {
+    console.log("❌ Senha incorreta".red);
+    return res.status(401).json({ error: "Senha incorreta" });
+  }
 
   const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
+
+  console.log(`✅ Login bem-sucedido: ${email}`.green);
   res.json({ token });
 });
 
+// RESET EMAIL
 app.post("/auth/reset", async (req, res) => {
   const { email } = req.body;
+  console.log(`📩 Pedindo reset de senha para: ${email}`.yellow);
+
   const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+  if (!user) {
+    console.log("❌ Usuário não encontrado no reset".red);
+    return res.status(404).json({ error: "Usuário não encontrado" });
+  }
 
   const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
   const link = `http://localhost:3000/reset-password/${token}`;
@@ -108,19 +152,26 @@ app.post("/auth/reset", async (req, res) => {
   res.json({ message: "E-mail de recuperação enviado!" });
 });
 
+// RESET PASSWORD
 app.post("/auth/reset/:token", async (req, res) => {
   const { password } = req.body;
+
   try {
     const { email } = jwt.verify(req.params.token, process.env.JWT_SECRET);
+
     const hashed = await bcrypt.hash(password, 10);
     await User.updateOne({ email }, { password: hashed });
+
+    console.log(`✅ Senha redefinida para: ${email}`.green);
     res.json({ message: "Senha atualizada com sucesso!" });
+
   } catch {
     res.status(400).json({ error: "Token inválido ou expirado" });
   }
 });
 
-// =================== ROTAS DE ITENS ===================
+// =================== ROTAS DE ESTOQUE ===================
+
 app.post("/items", async (req, res) => {
   try {
     const { nome, quantidade, armazem, dataChegada } = req.body;
@@ -139,12 +190,14 @@ app.post("/items", async (req, res) => {
     await History.create({
       itemId: newItem._id,
       action: "criado",
-      newValue: JSON.stringify({ nome, quantidade, armazem, dataChegada }),
+      newValue: JSON.stringify(newItem),
     });
 
+    console.log(`✅ Item criado: ${nome}`.green);
     res.status(201).json(newItem);
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erro ao criar item".red, err);
     res.status(500).json({ error: "Erro ao criar item" });
   }
 });
@@ -158,6 +211,7 @@ app.put("/items/:id", async (req, res) => {
   try {
     const { nome, quantidade, armazem, dataChegada } = req.body;
     const item = await Item.findById(req.params.id);
+
     if (!item) return res.status(404).json({ error: "Item não encontrado" });
 
     const oldValue = JSON.stringify(item);
@@ -176,9 +230,11 @@ app.put("/items/:id", async (req, res) => {
       newValue: JSON.stringify(item),
     });
 
+    console.log(`✏️ Item editado: ${item.nome}`.blue);
     res.json(item);
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erro ao editar item".red, err);
     res.status(500).json({ error: "Erro ao editar item" });
   }
 });
@@ -196,8 +252,11 @@ app.delete("/items/:id", async (req, res) => {
       oldValue: JSON.stringify(item),
     });
 
+    console.log(`🗑️ Item removido: ${item.nome}`.red);
     res.json({ message: "Item removido" });
+
   } catch (err) {
+    console.error("❌ Erro ao remover item".red, err);
     res.status(500).json({ error: "Erro ao remover item" });
   }
 });
@@ -209,4 +268,9 @@ app.get("/items/:id/history", async (req, res) => {
 
 // =================== SERVIDOR ===================
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Backend rodando em http://localhost:${PORT}`));
+
+app.listen(PORT, () => {
+  console.log(
+    `✅ Servidor rodando em http://localhost:${PORT}`.green.bold
+  );
+});
