@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 import CadastroProdutos from "../components/CadastroProdutos";
 import { Item, getDatePart } from "../components/types";
-import DashboardCards from "../components/DashBoardCards";
+import DashboardCards from "../components/DashBoard";
 import Movimentacoes from "../components/Movimentacao";
 import Footer from "../components/Footer";
 
