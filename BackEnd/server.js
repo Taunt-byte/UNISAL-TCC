@@ -6,6 +6,19 @@ import nodemailer from "nodemailer";
 import cors from "cors";
 import dotenv from "dotenv";
 import colors from "colors"; // <-- Para logs coloridos
+import mongoose from "mongoose";
+
+const MovSchema = new mongoose.Schema({
+  produto: String,
+  tipo: String,
+  quantidade: Number,
+  data: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export const Movimentacao = mongoose.model("Movimentacao", MovSchema);
 
 dotenv.config();
 
@@ -104,6 +117,95 @@ app.post("/auth/register", async (req, res) => {
 });
 
 // LOGIN
+app.post("/movimentacoes", async (req, res) => {
+  try {
+    const { produto, tipo, quantidade } = req.body;
+
+    const novaMov = await Movimentacao.create({
+      produto,
+      tipo,
+      quantidade,
+    });
+
+    res.json(novaMov);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao registrar movimentação" });
+  }
+});
+import Item from "./models/Item.js";
+import Movimentacao from "./models/Movimentacao.js";
+
+app.post("/movimentacoes", async (req, res) => {
+  try {
+    const { tipo, quantidade, produtoId, data } = req.body;
+    if (!produtoId || !quantidade || !tipo) return res.status(400).json({ error: "Campos obrigatórios" });
+
+    const item = await Item.findById(produtoId);
+    if (!item) return res.status(404).json({ error: "Produto não encontrado" });
+
+    let novoEstoque = tipo === "entrada" ? item.quantidade + Number(quantidade) : item.quantidade - Number(quantidade);
+    if (novoEstoque < 0) return res.status(400).json({ error: "Estoque insuficiente" });
+
+    // atualiza item
+    item.quantidade = novoEstoque;
+    await item.save();
+
+    // cria movimentacao
+    const mov = await Movimentacao.create({
+      produtoId,
+      produto: item.nome,
+      tipo,
+      quantidade: Number(quantidade),
+      data: data ? new Date(data) : undefined,
+    });
+
+    res.json({ mov, novoEstoque });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao registrar movimentação" });
+  }
+});
+app.get("/movimentacoes", async (req, res) => {
+  try {
+    const movs = await Movimentacao.find().sort({ data: -1 }).limit(100);
+    res.json(movs);
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao listar movimentações" });
+  }
+});
+
+app.get("/dashboard/stats", async (req, res) => {
+  try {
+    const produtos = await Item.find();
+    const movs = await Movimentacao.find();
+
+    const totalProdutos = produtos.length;
+
+    const produtosEmEstoque = produtos.reduce(
+      (soma, p) => soma + p.quantidade,
+      0
+    );
+
+    const produtosVendidos = movs
+      .filter((m) => m.tipo === "saida")
+      .reduce((total, m) => total + m.quantidade, 0);
+
+    const custoTotal = produtos.reduce(
+      (soma, p) => soma + (p.custo || 0) * p.quantidade,
+      0
+    );
+
+    res.json({
+      totalProdutos,
+      produtosEmEstoque,
+      produtosVendidos,
+      custoTotal,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao gerar estatísticas" });
+  }
+});
+
 app.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -171,6 +273,36 @@ app.post("/auth/reset/:token", async (req, res) => {
 });
 
 // =================== ROTAS DE ESTOQUE ===================
+app.post("/movimentacoes", async (req, res) => {
+  try {
+    const { tipo, quantidade, produtoId } = req.body;
+
+    const produto = await Item.findById(produtoId);
+    if (!produto) return res.status(404).json({ error: "Produto não encontrado" });
+
+    let novoEstoque =
+      tipo === "entrada"
+        ? produto.quantidade + quantidade
+        : produto.quantidade - quantidade;
+
+    if (novoEstoque < 0)
+      return res.status(400).json({ error: "Estoque insuficiente" });
+
+    await Item.updateOne({ _id: produtoId }, { quantidade: novoEstoque });
+
+    res.json({ message: "Movimentação registrada", novoEstoque });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao registrar movimentação" });
+  }
+});
+app.get("/movimentacoes", async (req, res) => {
+  try {
+    const movs = await Movimentacao.find().sort({ data: -1 });
+    res.json(movs);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao listar movimentações" });
+  }
+});
 
 app.post("/items", async (req, res) => {
   try {

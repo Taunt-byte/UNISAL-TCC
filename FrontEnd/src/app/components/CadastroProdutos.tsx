@@ -23,42 +23,51 @@ export default function CadastroProdutos({ onSave, totalAtual }: ProductFormProp
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    const quantidadeNum = Number(formData.quantidade);
-    const custoNum = Number(formData.custo);
+const handleSubmit = async () => {
+  const quantidadeNum = Number(formData.quantidade);
+  const custoNum = Number(formData.custo);
 
-    // ✅ Validação
-    if (!formData.nome.trim()) return alert("O nome do produto é obrigatório.");
-    if (!quantidadeNum || quantidadeNum <= 0)
-      return alert("A quantidade deve ser maior que zero.");
-    if (!formData.dataChegada) return alert("A data de chegada é obrigatória.");
+  if (!formData.nome.trim()) return alert("O nome do produto é obrigatório.");
+  if (!quantidadeNum || quantidadeNum <= 0)
+    return alert("A quantidade deve ser maior que zero.");
+  if (!formData.dataChegada) return alert("A data de chegada é obrigatória.");
 
-    // ✅ Limite de estoque total
-    if (totalAtual + quantidadeNum > 300)
-      return alert("❌ Limite máximo de 300 unidades no estoque atingido!");
+  if (totalAtual + quantidadeNum > 300)
+    return alert("❌ Limite máximo de 300 unidades no estoque atingido!");
 
-    // ✅ Salvar produto
-    onSave({
-      nome: formData.nome,
-      quantidade: quantidadeNum,
-      custo: custoNum,
-      categoria: formData.categoria,
-      armazem: formData.armazem,
-      dataChegada: formData.dataChegada,
-      status: formData.status as Item["status"],
+  // 🔥 Enviar para o backend
+  try {
+    const response = await fetch("http://localhost:4000/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nome: formData.nome,
+        quantidade: quantidadeNum,
+        armazem: formData.armazem,
+        dataChegada: formData.dataChegada,
+      }),
     });
 
-    // ✅ Reset form
-    setFormData({
-      nome: "",
-      quantidade: "",
-      custo: "",
-      categoria: "",
-      armazem: "",
-      dataChegada: "",
-      status: "Em andamento",
-    });
-  };
+    if (!response.ok) throw new Error("Erro ao salvar no servidor");
+
+    alert("Produto adicionado com sucesso!");
+
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao salvar no servidor.");
+  }
+
+  setFormData({
+    nome: "",
+    quantidade: "",
+    custo: "",
+    categoria: "",
+    armazem: "",
+    dataChegada: "",
+    status: "Em andamento",
+  });
+};
+
 
   return (
     <div className="bg-violet-800 text-white p-6 rounded-xl border border-violet-700 shadow-lg mb-8 font-[Cambria]">

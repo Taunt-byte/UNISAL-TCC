@@ -26,46 +26,81 @@ export default function Movimentacoes() {
   });
   const [mensagem, setMensagem] = useState("");
 
-  // Mock inicial (depois você liga com o backend real)
+  // Carrega produtos do banco
   useEffect(() => {
-    setProdutos([
-      { _id: "1", nome: "Placa Arduino", estoque: 120, estoqueMinimo: 20 },
-      { _id: "2", nome: "Sensor PIR", estoque: 45, estoqueMinimo: 10 },
-      { _id: "3", nome: "Fonte 12V", estoque: 18, estoqueMinimo: 5 },
-    ]);
+    async function carregarProdutos() {
+      try {
+        const res = await fetch("http://localhost:4000/items");
+        const data = await res.json();
+
+        const produtosTratados = data.map((item: any) => ({
+          _id: item._id,
+          nome: item.nome,
+          estoque: item.quantidade,
+          estoqueMinimo: 10,
+        }));
+
+        setProdutos(produtosTratados);
+      } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+      }
+    }
+
+    carregarProdutos();
   }, []);
 
-  function registrar(e: React.FormEvent) {
+  // REGISTRAR MOVIMENTAÇÃO (agora conectado ao backend)
+  async function registrar(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!movimentacao.produtoId) {
+      setMensagem("❌ Selecione um produto!");
+      return;
+    }
+
+    if (movimentacao.quantidade <= 0) {
+      setMensagem("❌ Quantidade inválida!");
+      return;
+    }
 
     const produto = produtos.find((p) => p._id === movimentacao.produtoId);
     if (!produto) return;
 
+    // Verifica saída maior que estoque
     if (movimentacao.tipo === "saida" && movimentacao.quantidade > produto.estoque) {
       setMensagem("❌ A quantidade de saída é maior que o estoque disponível!");
       return;
     }
 
-    // Atualiza o estoque
-    const novoEstoque =
-      movimentacao.tipo === "entrada"
-        ? produto.estoque + movimentacao.quantidade
-        : produto.estoque - movimentacao.quantidade;
+    // Envia para o backend
+    try {
+      const response = await fetch("http://localhost:4000/movimentacoes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(movimentacao),
+      });
 
-    const atualizado = produtos.map((p) =>
-      p._id === produto._id ? { ...p, estoque: novoEstoque } : p
-    );
-    setProdutos(atualizado);
+      const data = await response.json();
 
-    setMensagem(
-      `✅ Movimentação registrada com sucesso! Estoque atual de "${produto.nome}": ${novoEstoque}`
-    );
+      if (!response.ok) {
+        setMensagem("❌ " + data.error);
+        return;
+      }
 
-    // Alerta de estoque mínimo
-    if (novoEstoque < produto.estoqueMinimo) {
-      setMensagem(
-        `⚠️ Atenção: O produto "${produto.nome}" está abaixo do estoque mínimo! Estoque atual: ${novoEstoque}`
+      // Atualiza estoque local
+      setProdutos((antigos) =>
+        antigos.map((p) =>
+          p._id === movimentacao.produtoId
+            ? { ...p, estoque: data.novoEstoque }
+            : p
+        )
       );
+
+      setMensagem(`✅ Movimentação registrada com sucesso!`);
+
+    } catch (err) {
+      console.error(err);
+      setMensagem("❌ Erro ao registrar movimentação.");
     }
   }
 
@@ -82,11 +117,7 @@ export default function Movimentacoes() {
         Registro de Movimentações (Entrada/Saída)
       </h1>
 
-      {/* ---------- FORMULÁRIO PRINCIPAL ---------- */}
-      <form
-        onSubmit={registrar}
-        className="bg-violet-900 p-8 rounded-2xl shadow-xl max-w-2xl"
-      >
+      <form onSubmit={registrar} className="bg-violet-900 p-8 rounded-2xl shadow-xl max-w-2xl">
         <h2 className="text-2xl font-semibold mb-5">Registrar Movimentação</h2>
 
         {/* Tipo */}
@@ -95,10 +126,7 @@ export default function Movimentacoes() {
           <select
             value={movimentacao.tipo}
             onChange={(e) =>
-              setMovimentacao({
-                ...movimentacao,
-                tipo: e.target.value as "entrada" | "saida",
-              })
+              setMovimentacao({ ...movimentacao, tipo: e.target.value as "entrada" | "saida" })
             }
             className="w-full p-3 rounded-lg bg-violet-700 text-white mt-1"
           >
@@ -113,10 +141,7 @@ export default function Movimentacoes() {
           <select
             value={movimentacao.produtoId}
             onChange={(e) =>
-              setMovimentacao({
-                ...movimentacao,
-                produtoId: e.target.value,
-              })
+              setMovimentacao({ ...movimentacao, produtoId: e.target.value })
             }
             className="w-full p-3 rounded-lg bg-violet-700 text-white mt-1"
             required
@@ -137,10 +162,7 @@ export default function Movimentacoes() {
             type="number"
             value={movimentacao.quantidade}
             onChange={(e) =>
-              setMovimentacao({
-                ...movimentacao,
-                quantidade: Number(e.target.value),
-              })
+              setMovimentacao({ ...movimentacao, quantidade: Number(e.target.value) })
             }
             className="w-full p-3 rounded-lg bg-violet-700 text-white mt-1"
             required
@@ -155,16 +177,12 @@ export default function Movimentacoes() {
             type="date"
             value={movimentacao.data}
             onChange={(e) =>
-              setMovimentacao({
-                ...movimentacao,
-                data: e.target.value,
-              })
+              setMovimentacao({ ...movimentacao, data: e.target.value })
             }
             className="w-full p-3 rounded-lg bg-violet-700 text-white mt-1"
           />
         </label>
 
-        {/* Botão */}
         <button
           type="submit"
           className="mt-5 w-full bg-violet-600 hover:bg-violet-500 p-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2"
@@ -174,12 +192,10 @@ export default function Movimentacoes() {
           ) : (
             <ArrowUpCircle className="w-6 h-6" />
           )}
-
           Registrar {movimentacao.tipo === "entrada" ? "Entrada" : "Saída"}
         </button>
       </form>
 
-      {/* ---------- MENSAGEM ---------- */}
       {mensagem && (
         <p className="mt-6 bg-violet-700 p-4 rounded-xl text-center text-lg font-semibold">
           {mensagem}
