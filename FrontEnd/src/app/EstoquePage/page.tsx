@@ -2,11 +2,9 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
-import CadastroProdutos from "../components/CadastroProdutos";
-import { Item, getDatePart } from "../components/types";
-import DashboardCards from "../components/DashBoard";
-import Movimentacoes from "../components/Movimentacao";
+import Dashboard from "../components/DashBoard";
 import Footer from "../components/Footer";
+import { Item } from "../components/types";
 
 export default function EstoquePage() {
   const [items, setItems] = useState<Item[]>([]);
@@ -18,16 +16,6 @@ export default function EstoquePage() {
       .catch(console.error);
   }, []);
 
-  const handleSave = async (novo: Omit<Item, "_id">) => {
-    const res = await fetch("http://localhost:4000/items", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(novo),
-    });
-    const created = await res.json();
-    setItems((prev) => [created, ...prev]);
-  };
-
   const totalEstoque = useMemo(
     () => items.reduce((acc, i) => acc + i.quantidade, 0),
     [items]
@@ -36,34 +24,56 @@ export default function EstoquePage() {
   return (
     <div className="bg-gray-100 min-h-screen text-black font-[Cambria]">
       <Navbar />
+
       <div className="max-w-6xl mx-auto p-5">
-        <h1 className="text-3xl font-bold text-center">
+        <h1 className="text-3xl font-bold text-center mb-8">
           Gestão de Estoque
         </h1>
+
+        {/* ======== Dashboard ======== */}
+        <div className="mb-12">
+          <Dashboard />
         </div>
-        <div className="max-w-6xl mx-auto p-2 p-6 mb-12">
-        <DashboardCards
-          totalProdutos={items.length}
-          produtosEmEstoque={items.reduce(
-            (acc, item) => acc + item.quantidade,
-            0
-          )}
-          produtosVendidos={items.reduce((acc, item) => acc + item.vendidos, 0)}
-          custoTotal={items.reduce(
-            (acc, item) => acc + item.custo * item.quantidade,
-            0
-          )}
-        />
+
+        {/* ======== AÇÕES PRINCIPAIS ======== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
+
+          {/* Botão 1 - Exibir Gráfico */}
+          <button
+            onClick={() => window.location.href = "/GraficoEstoque"}
+            className="bg-blue-700 text-white py-6 rounded-xl shadow-md hover:bg-blue-800 transition font-semibold text-lg"
+          >
+            📊 Exibir Gráfico de Armazenamento
+          </button>
+
+          {/* Botão 2 - Exibir Tabela */}
+          <button
+            onClick={() => window.location.href = "/Produtos"}
+            className="bg-green-600 text-white py-6 rounded-xl shadow-md hover:bg-green-700 transition font-semibold text-lg"
+          >
+            📋 Exibir Tabela de Produtos
+          </button>
+
+          {/* Botão 3 - Adicionar Produto */}
+          <button
+            onClick={() => window.location.href = "/adicionarProduto"}
+            className="bg-indigo-600 text-white py-6 rounded-xl shadow-md hover:bg-indigo-700 transition font-semibold text-lg"
+          >
+            ➕ Adicionar Produto
+          </button>
+
+          {/* Botão 4 - Adicionar Armazém */}
+          <button
+            onClick={() => window.location.href = "/adicionarArmazem"}
+            className="bg-orange-600 text-white py-6 rounded-xl shadow-md hover:bg-orange-700 transition font-semibold text-lg"
+          >
+            🏭 Adicionar Armazém
+          </button>
+        </div>
+
       </div>
-        <div>
-        <CadastroProdutos onSave={handleSave} totalAtual={totalEstoque} />
-        </div>
-        <div>
-          <Movimentacoes />
-        </div>
+
       <Footer />
     </div>
-
-    
   );
 }
