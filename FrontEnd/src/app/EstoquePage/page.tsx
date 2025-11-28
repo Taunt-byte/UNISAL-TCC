@@ -26,49 +26,59 @@ export default function EstoquePage() {
       <Navbar />
 
       <div className="max-w-6xl mx-auto p-5">
-        <h1 className="text-3xl font-bold text-center mb-8">
+        <h1 className="text-3xl font-bold text-center mb-10">
           Gestão de Estoque
         </h1>
 
-        {/* ======== Dashboard ======== */}
-        <div className="mb-12">
-          <Dashboard />
-        </div>
-
         {/* ======== AÇÕES PRINCIPAIS ======== */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
+        <div className="
+          grid 
+          grid-cols-1 
+          md:grid-cols-2 
+          lg:grid-cols-4 
+          gap-3 
+          mb-16
+        ">
 
-          {/* Botão 1 - Exibir Gráfico */}
+          {/* Botões com espaçamento reduzido e design unificado */}
           <button
-            onClick={() => window.location.href = "/GraficoEstoque"}
-            className="bg-blue-700 text-white py-6 rounded-xl shadow-md hover:bg-blue-800 transition font-semibold text-lg"
+            onClick={() => (window.location.href = "/GraficoEstoque")}
+            className="bg-blue-700 text-white py-5 rounded-xl shadow-lg hover:bg-blue-800 
+                       transition font-semibold text-lg h-full"
           >
             📊 Exibir Gráfico de Armazenamento
           </button>
 
-          {/* Botão 2 - Exibir Tabela */}
           <button
-            onClick={() => window.location.href = "/Produtos"}
-            className="bg-green-600 text-white py-6 rounded-xl shadow-md hover:bg-green-700 transition font-semibold text-lg"
+            onClick={() => (window.location.href = "/Produtos")}
+            className="bg-green-600 text-white py-5 rounded-xl shadow-lg hover:bg-green-700 
+                       transition font-semibold text-lg h-full"
           >
             📋 Exibir Tabela de Produtos
           </button>
 
-          {/* Botão 3 - Adicionar Produto */}
           <button
-            onClick={() => window.location.href = "/adicionarProduto"}
-            className="bg-indigo-600 text-white py-6 rounded-xl shadow-md hover:bg-indigo-700 transition font-semibold text-lg"
+            onClick={() => (window.location.href = "/adicionarProduto")}
+            className="bg-indigo-600 text-white py-5 rounded-xl shadow-lg hover:bg-indigo-700 
+                       transition font-semibold text-lg h-full"
           >
             ➕ Adicionar Produto
           </button>
 
-          {/* Botão 4 - Adicionar Armazém */}
           <button
-            onClick={() => window.location.href = "/adicionarArmazem"}
-            className="bg-orange-600 text-white py-6 rounded-xl shadow-md hover:bg-orange-700 transition font-semibold text-lg"
+            onClick={() => (window.location.href = "/adicionarArmazem")}
+            className="bg-orange-600 text-white py-5 rounded-xl shadow-lg hover:bg-orange-700 
+                       transition font-semibold text-lg h-full"
           >
             🏭 Adicionar Armazém
           </button>
+
+
+        </div>
+
+        {/* ======== Dashboard ======== */}
+        <div className="mb-12">
+          <Dashboard />
         </div>
 
       </div>

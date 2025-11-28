@@ -1,137 +1,133 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { AlertTriangle, Package, ShoppingBag, Layers, DollarSign } from "lucide-react";
-import { motion } from "framer-motion";
+import { Search, Package, Warehouse, DollarSign, Layers } from "lucide-react";
 
-export default function Dashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [alerts, setAlerts] = useState<any[]>([]);
+export default function DashboardProdutos() {
+  const [produtos, setProdutos] = useState([]);
+  const [filtro, setFiltro] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const API = "http://localhost:4000";
-
   useEffect(() => {
-    async function fetchData() {
+    async function load() {
       try {
-        const s = await fetch(`${API}/dashboard/stats`).then((r) => r.json());
-        const a = await fetch(`${API}/dashboard/alerts?t=10`).then((r) => r.json());
-
-        setStats(s);
-        setAlerts(a);
-      } catch (err) {
-        console.error("Erro ao buscar dados", err);
-      } finally {
-        setLoading(false);
+        const res = await fetch("http://localhost:4000/items");
+        const data = await res.json();
+        setProdutos(data);
+      } catch (e) {
+        console.error("Erro ao carregar produtos:", e);
       }
+      setLoading(false);
     }
-    fetchData();
+
+    load();
   }, []);
 
-  if (loading || !stats) {
-    return (
-      <div className="w-full flex justify-center mt-10 text-white text-xl bg-gray-900 border border-black rounded-2xl shadow-md p-6">
-        Carregando dashboard...
-      </div>
-    );
-  }
+  const produtosFiltrados = produtos.filter((p) =>
+    p.nome.toLowerCase().includes(filtro.toLowerCase())
+  );
 
-  // Dados do gráfico
-  const chartData = Object.entries(stats.seriesMonthly).map(([mes, dados]: any) => ({
-    mes,
-    entrada: dados.entrada,
-    saida: dados.saida,
-  }));
+  const totalProdutos = produtos.length;
+  const totalEstoque = produtos.reduce((acc, p) => acc + Number(p.quantidade), 0);
+  const custoTotal = produtos.reduce((acc, p) => acc + Number(p.custo), 0);
 
   return (
-    <div className="p-6 text-white space-y-6" style={{ fontFamily: "Cambria" }}>
-      
-      {/* =================== CARDS =================== */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        
-        <StatCard 
-          icon={<Package size={30} />}
-          title="Total de Produtos"
-          value={stats.totalProdutos}
-        />
+    <div className="p-6 bg-white min-h-screen font-[Cambria] text-[#3A0CA3]">
+      {/* TÍTULO */}
+      <h1 className="text-4xl font-bold mb-8 text-center text-[#5B21B6]">
+        📦 Dashboard de Produtos
+      </h1>
 
-        <StatCard 
-          icon={<Layers size={30} />}
-          title="Produtos em Estoque"
-          value={stats.produtosEmEstoque}
-        />
+      {/* CARDS RESUMO */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
-        <StatCard 
-          icon={<ShoppingBag size={30} />}
-          title="Produtos produzidos"
-          value={stats.produtosProduzidos}
-        />
-
-        <StatCard 
-          icon={<DollarSign size={30} />}
-          title="Custo Total"
-          value={`R$ ${stats.custoTotal.toFixed(2)}`}
-        />
-      </div>
-
-      {/* =================== GRÁFICO =================== */}
-      <div className="bg-[#3B3030] border border-[#795757] rounded-2xl shadow-md p-6">
-        <h2 className="text-white text-xl mb-4">Movimentações Mensais</h2>
-
-        <div className="w-full h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <XAxis dataKey="mes" stroke="#fff" />
-              <YAxis stroke="#fff" />
-              <Tooltip />
-              <Bar dataKey="entrada" fill="#4ade80" name="Entradas" />
-              <Bar dataKey="saida" fill="#f87171" name="Saídas" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="bg-[#F3E8FF] border border-[#D8B4FE] shadow-md rounded-2xl p-6 flex items-center gap-4">
+          <Package className="w-12 h-12 text-[#7C3AED]" />
+          <div>
+            <p className="text-sm text-[#6B21A8]">Total de Produtos</p>
+            <p className="text-3xl font-bold text-black">{totalProdutos}</p>
+          </div>
         </div>
+
+        <div className="bg-[#F3E8FF] border border-[#D8B4FE] shadow-md rounded-2xl p-6 flex items-center gap-4">
+          <Layers className="w-12 h-12 text-[#6D28D9]" />
+          <div>
+            <p className="text-sm text-[#6B21A8]">Itens em Estoque</p>
+            <p className="text-3xl font-bold text-black">{totalEstoque}</p>
+          </div>
+        </div>
+
+        <div className="bg-[#F3E8FF] border border-[#D8B4FE] shadow-md rounded-2xl p-6 flex items-center gap-4">
+          <DollarSign className="w-12 h-12 text-[#9333EA]" />
+          <div>
+            <p className="text-sm text-[#6B21A8]">Custo Total</p>
+            <p className="text-3xl font-bold text-black">R$ {custoTotal}</p>
+          </div>
+        </div>
+
       </div>
 
-      {/* =================== ALERTAS =================== */}
-      <div className="bg-[#3B3030] border border-[#795757] rounded-2xl shadow-md p-6">
-        <h2 className="text-white text-xl flex gap-2 items-center mb-4">
-          <AlertTriangle className="text-yellow-400" /> Alertas de Estoque Baixo
-        </h2>
+      {/* BARRA DE BUSCA */}
+      <div className="flex items-center bg-[#F3E8FF] border border-[#D8B4FE] shadow-md rounded-2xl p-4 w-full md:w-2/3 mb-6 mx-auto">
+        <Search className="text-[#6B21A8] mr-3" />
+        <input
+          type="text"
+          placeholder="Buscar produto..."
+          className="outline-none w-full bg-transparent text-black"
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+        />
+      </div>
 
-        {alerts.length === 0 ? (
-          <p className="text-green-300 text-lg">Nenhum produto em situação crítica.</p>
+      {/* TABELA */}
+      <div className="bg-white shadow-lg border border-[#D8B4FE] rounded-2xl overflow-hidden">
+
+        {loading ? (
+          <div className="p-6 animate-pulse text-gray-500">Carregando produtos...</div>
         ) : (
-          <ul className="space-y-2">
-            {alerts.map((p) => (
-              <li
-                key={p._id}
-                className="p-3 bg-[#795757] rounded-xl text-white shadow-md"
-              >
-                <strong>{p.nome}</strong> — {p.quantidade} unidades
-              </li>
-            ))}
-          </ul>
+          <table className="w-full text-left">
+
+            {/* CABEÇALHO */}
+            <thead className="bg-[#E9D5FF] text-[#4C1D95]">
+              <tr>
+                <th className="p-4">Produto</th>
+                <th className="p-4">Armazém</th>
+                <th className="p-4">Quantidade</th>
+                <th className="p-4">Custo</th>
+                <th className="p-4">Chegada</th>
+              </tr>
+            </thead>
+
+            {/* CORPO */}
+            <tbody>
+              {produtosFiltrados.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center p-6 text-gray-500">
+                    Nenhum produto encontrado.
+                  </td>
+                </tr>
+              ) : (
+                produtosFiltrados.map((p) => (
+                  <tr
+                    key={p._id}
+                    className="border-t border-[#E9D5FF] hover:bg-[#F3E8FF] transition"
+                  >
+                    <td className="p-4 text-black">{p.nome}</td>
+                    <td className="p-4 text-black">{p.armazem}</td>
+                    <td className="p-4 text-black">{p.quantidade}</td>
+                    <td className="p-4 text-black">R$ {p.custo}</td>
+                    <td className="p-4 text-black">
+                      {new Date(p.dataChegada).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+
+          </table>
         )}
+
       </div>
     </div>
-  );
-}
-
-/* =================== COMPONENTE DE CARD =================== */
-function StatCard({ icon, title, value }: any) {
-  return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <div className="bg-[#3B3030] border border-[#795757] rounded-2xl text-white shadow-lg p-6">
-        <div className="flex items-center gap-4">
-          <div className="p-4 bg-[#795757] rounded-2xl text-white shadow-md">
-            {icon}
-          </div>
-          <div>
-            <p className="text-sm">{title}</p>
-            <h3 className="text-2xl font-bold">{value}</h3>
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 }

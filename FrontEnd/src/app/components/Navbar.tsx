@@ -31,7 +31,7 @@ export default function Navbar() {
 
         {/* LINKS DESKTOP */}
         <div className="hidden md:flex space-x-6 items-center">
-          <Link href="/" className="hover:text-gray-300">Início</Link>
+          <Link href="/EstoquePage" className="hover:text-gray-300">Início</Link>
           <Link href="/Sobre" className="hover:text-gray-300">Sobre</Link>
           <Link href="/Contato" className="hover:text-gray-300">Contato</Link>
         </div>
